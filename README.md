@@ -1,70 +1,153 @@
-# Getting Started with Create React App
+🚗⚡ MECHFUEL – Emergency Fuel & Mechanical Service App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack MERN application offering on-road fuel delivery and instant mechanical services with live location picking.
 
-## Available Scripts
+🌟 Project Overview
 
-In the project directory, you can run:
+MECHFUEL is a complete full-stack application built with:
 
-### `npm start`
+React.js (Frontend)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Node.js + Express (Backend)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+MongoDB Atlas (Database)
 
-### `npm test`
+It allows users to:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+✔ Request fuel delivery
+✔ Book mechanical repair services
+✔ Use interactive map to pick exact location
+✔ Authenticate via JWT (Login / Register)
+✔ View order/service summary
+✔ Submit service requests
 
-### `npm run build`
+🛠️ Tech Stack
+Frontend – /client
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+React.js
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+React Router
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Material-UI
 
-### `npm run eject`
+Leaflet Maps + GeoSearch
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Context API for Auth
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Backend – /server
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Node.js
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Express
 
-## Learn More
+MongoDB + Mongoose
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+JWT Authentication
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Multer (uploads)
 
-### Code Splitting
+Helmet, CORS, Rate Limiter
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+📁 Project Structure
+MECHFUEL/
+│── client/          # React Frontend
+│── server/          # Node/Express Backend
+│── package.json     # root-level metadata
+│── README.md
 
-### Analyzing the Bundle Size
+⚙️ Setup Instructions
+🖥 1. Clone the project
+git clone https://github.com/<your-username>/mechfuel.git
+cd mechfuel
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+🚀 2. Setup Frontend (client)
+cd client
+npm install
+npm start
 
-### Making a Progressive Web App
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Frontend runs at 👉 http://localhost:3000
 
-### Advanced Configuration
+🛠 3. Setup Backend (server)
+cd server
+npm install
+npm run dev
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-### Deployment
+Backend runs at 👉 http://localhost:5000
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+🔐 4. Environment Variables
 
-### `npm run build` fails to minify
+Inside /server create a .env file:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+NODE_ENV=development
+PORT=5000
+MONGODB_URI=<your MongoDB Atlas connection string>
+JWT_SECRET=<your-secret-key>
+CORS_ORIGIN=http://localhost:3000
+
+🔥 Main Features
+🔑 Authentication
+
+Register
+
+Login
+
+JWT protected routes
+
+⛽ Fuel Delivery Flow
+
+Select fuel type
+
+Choose quantity
+
+Pick location on map
+
+🔧 Mechanical Service Flow
+
+Select multiple services
+
+Enter vehicle details
+
+Add problem description
+
+Location picker
+
+Checkout page
+
+🛡 Backend Security
+
+Helmet
+
+CORS
+
+Rate limiting
+
+Validation middleware
+
+📡 API Endpoints (Summary)
+Auth
+POST   /api/auth/register
+POST   /api/auth/login
+GET    /api/auth/profile
+
+Fuel Orders
+POST   /api/fuel/orders
+GET    /api/fuel/orders
+
+Mechanical Services
+POST   /api/mech/requests
+GET    /api/mech/requests
+
+🧱 Build Frontend for Production
+cd client
+npm run build
+
+
+Output goes to /client/build.
+
+🧑‍💻 Author
+
+Varun Anumari (Nani)
+🚀 Full-stack developer in progress
+🔥 Passionate about MERN stack + real-world projects

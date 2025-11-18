@@ -1,0 +1,180 @@
+const MechanicalService = require('../models/MechanicalService');
+
+// Service pricing configuration
+const SERVICE_PRICES = {
+    'battery_jumpstart': 25,
+    'tire_change': 40,
+    'lockout_service': 30,
+    'tow_service': 75,
+    'fuel_delivery': 15,
+    'engine_repair': 100,
+    'other': 50
+};
+
+// Create new mechanical service request
+const createServiceRequest = async (req, res) => {
+    try {
+        const { services, vehicleDetails, location, problemDescription } = req.body;
+        
+        // Validate services array
+        if (!services || !Array.isArray(services) || services.length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'At least one service must be selected'
+            });
+        }
+
+        // Calculate total amount
+        const totalAmount = services.reduce((total, service) => {
+            return total + (SERVICE_PRICES[service] || 0);
+        }, 0);
+
+        const mechanicalService = await MechanicalService.create({
+            userId: req.user.userId,
+            services,
+            vehicleDetails,
+            location,
+            problemDescription,
+            totalAmount
+        });
+
+        // Populate user details
+        await mechanicalService.populate('userId', 'username email phone');
+
+        res.status(201).json({
+            success: true,
+            message: 'Service request created successfully',
+            data: { service: mechanicalService }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error creating service request'
+        });
+    }
+};
+
+// Get user's service requests
+const getUserServiceRequests = async (req, res) => {
+    try {
+        const services = await MechanicalService.find({ userId: req.user.userId })
+            .sort({ createdAt: -1 })
+            .populate('userId', 'username email phone')
+            .populate('assignedMechanic', 'username email phone');
+
+        res.json({
+            success: true,
+            data: { services }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error fetching service requests'
+        });
+    }
+};
+
+// Get single service request
+const getServiceRequest = async (req, res) => {
+    try {
+        const service = await MechanicalService.findOne({
+            _id: req.params.id,
+            userId: req.user.userId
+        })
+        .populate('userId', 'username email phone')
+        .populate('assignedMechanic', 'username email phone');
+
+        if (!service) {
+            return res.status(404).json({
+                success: false,
+                error: 'Service request not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: { service }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error fetching service request'
+        });
+    }
+};
+
+// Update service request status
+const updateServiceStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        
+        const service = await MechanicalService.findOneAndUpdate(
+            { _id: req.params.id, userId: req.user.userId },
+            { status },
+            { new: true }
+        )
+        .populate('userId', 'username email phone')
+        .populate('assignedMechanic', 'username email phone');
+
+        if (!service) {
+            return res.status(404).json({
+                success: false,
+                error: 'Service request not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Service status updated successfully',
+            data: { service }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error updating service request'
+        });
+    }
+};
+
+// Get available service types and prices
+const getServiceTypes = async (req, res) => {
+    try {
+        const serviceTypes = Object.entries(SERVICE_PRICES).map(([service, price]) => ({
+            service,
+            name: formatServiceName(service),
+            price
+        }));
+
+        res.json({
+            success: true,
+            data: { serviceTypes }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error fetching service types'
+        });
+    }
+};
+
+// Helper function to format service names
+const formatServiceName = (service) => {
+    const nameMap = {
+        'battery_jumpstart': 'Battery Jumpstart',
+        'tire_change': 'Tire Change',
+        'lockout_service': 'Lockout Service',
+        'tow_service': 'Tow Service',
+        'fuel_delivery': 'Fuel Delivery',
+        'engine_repair': 'Engine Repair',
+        'other': 'Other Service'
+    };
+    return nameMap[service] || service;
+};
+
+module.exports = {
+    createServiceRequest,
+    getUserServiceRequests,
+    getServiceRequest,
+    updateServiceStatus,
+    getServiceTypes
+};
