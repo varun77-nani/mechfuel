@@ -1,11 +1,13 @@
 const express = require('express');
 const { body } = require('express-validator');
 const {
+    getAllServiceRequests,
     createServiceRequest,
     getUserServiceRequests,
     getServiceRequest,
     updateServiceStatus,
-    getServiceTypes
+    getServiceTypes,
+    deleteServiceRequest
 } = require('../controllers/mechanicalServiceController');
 const { authenticate, optionalAuth } = require('../middleware/authMiddleware');
 const { handleValidationErrors } = require('../middleware/validationMiddleware');
@@ -61,7 +63,10 @@ router.get('/types', optionalAuth, getServiceTypes);
 // Protected routes
 router.use(authenticate);
 
-// Routes with file upload support
+// Admin route to get all requests
+router.get('/admin/all', getAllServiceRequests);
+
+// User routes with file upload support
 router.post(
     '/',
     upload.array('images', 5),
@@ -74,5 +79,6 @@ router.post(
 router.get('/', getUserServiceRequests);
 router.get('/:id', getServiceRequest);
 router.patch('/:id/status', statusValidation, handleValidationErrors, updateServiceStatus);
+router.delete('/:id', deleteServiceRequest);
 
 module.exports = router;

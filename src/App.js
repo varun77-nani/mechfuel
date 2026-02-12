@@ -4,6 +4,7 @@ import FuelOrder from './pages/FuelService/FuelOrder';
 import ServiceRequest from './pages/MechanicalService/ServiceRequest';
 import ServiceCheckout from './pages/MechanicalService/ServiceCheckout'; // ✅ added
 import AdminDashboard from './pages/Admin/AdminDashboard'; // ✅ added
+import Dashboard from './pages/Dashboard'; // ✅ User dashboard
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Header from './components/common/Header';
@@ -32,6 +33,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <ServiceCheckout />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ✅ User Dashboard Route */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
               </ProtectedRoute>
             }
           />

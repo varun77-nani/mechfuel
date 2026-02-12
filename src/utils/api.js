@@ -56,7 +56,10 @@ export const fuelApi = {
     }),
 
   getMyOrders: () => apiRequest("/fuel-orders"),
-};
+  deleteOrder: (orderId) =>
+    apiRequest(`/fuel-orders/${orderId}`, {
+      method: "DELETE",
+    }),};
 
 // ---------------- Mechanical service APIs ----------------
 // MATCHES BACKEND → /api/mechanical-services
@@ -70,7 +73,10 @@ export const mechApi = {
   getMyServices: () => apiRequest("/mechanical-services"),
 
   getServiceTypes: () => apiRequest("/mechanical-services/types", { auth: false }),
-};
+  deleteService: (serviceId) =>
+    apiRequest(`/mechanical-services/${serviceId}`, {
+      method: "DELETE",
+    }),};
 
 // ---------------- User APIs ----------------
 export const userApi = {

@@ -1,10 +1,12 @@
 const express = require('express');
 const { body } = require('express-validator');
 const {
+    getAllFuelOrders,
     createFuelOrder,
     getUserFuelOrders,
     getFuelOrder,
-    updateFuelOrderStatus
+    updateFuelOrderStatus,
+    deleteFuelOrder
 } = require('../controllers/fuelOrderController');
 const { authenticate } = require('../middleware/authMiddleware');
 const { handleValidationErrors } = require('../middleware/validationMiddleware');
@@ -48,10 +50,14 @@ const statusValidation = [
 // All routes require authentication
 router.use(authenticate);
 
-// Routes
+// Admin route to get all orders
+router.get('/admin/all', getAllFuelOrders);
+
+// User routes
 router.post('/', fuelOrderValidation, handleValidationErrors, createFuelOrder);
 router.get('/', getUserFuelOrders);
 router.get('/:id', getFuelOrder);
 router.patch('/:id/status', statusValidation, handleValidationErrors, updateFuelOrderStatus);
+router.delete('/:id', deleteFuelOrder);
 
 module.exports = router;

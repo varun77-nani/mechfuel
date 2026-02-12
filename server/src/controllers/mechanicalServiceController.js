@@ -1,14 +1,34 @@
 const MechanicalService = require('../models/MechanicalService');
 
-// Service pricing configuration
+// Service pricing configuration (in INR)
 const SERVICE_PRICES = {
-    'battery_jumpstart': 25,
-    'tire_change': 40,
-    'lockout_service': 30,
-    'tow_service': 75,
-    'fuel_delivery': 15,
-    'engine_repair': 100,
-    'other': 50
+    'battery_jumpstart': 2075,      // 25 USD
+    'tire_change': 3320,             // 40 USD
+    'lockout_service': 2490,         // 30 USD
+    'tow_service': 6225,             // 75 USD
+    'fuel_delivery': 1245,           // 15 USD
+    'engine_repair': 8300,           // 100 USD
+    'other': 4150                    // 50 USD
+};
+
+// Get all service requests (admin)
+const getAllServiceRequests = async (req, res) => {
+    try {
+        const services = await MechanicalService.find()
+            .sort({ createdAt: -1 })
+            .populate('userId', 'username email phone')
+            .populate('assignedMechanic', 'username email phone');
+
+        res.json({
+            success: true,
+            data: { services, total: services.length }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error fetching service requests'
+        });
+    }
 };
 
 // Create new mechanical service request
@@ -157,6 +177,33 @@ const getServiceTypes = async (req, res) => {
     }
 };
 
+// Delete service request
+const deleteServiceRequest = async (req, res) => {
+    try {
+        const service = await MechanicalService.findOneAndDelete({
+            _id: req.params.id,
+            userId: req.user.userId
+        });
+
+        if (!service) {
+            return res.status(404).json({
+                success: false,
+                error: 'Service request not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Service request deleted successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Error deleting service request'
+        });
+    }
+};
+
 // Helper function to format service names
 const formatServiceName = (service) => {
     const nameMap = {
@@ -172,9 +219,11 @@ const formatServiceName = (service) => {
 };
 
 module.exports = {
+    getAllServiceRequests,
     createServiceRequest,
     getUserServiceRequests,
     getServiceRequest,
     updateServiceStatus,
-    getServiceTypes
+    getServiceTypes,
+    deleteServiceRequest
 };

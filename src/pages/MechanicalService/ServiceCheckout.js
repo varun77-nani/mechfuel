@@ -484,7 +484,7 @@ export default function ServiceCheckout() {
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h6">Total</Typography>
                 <Typography variant="h6" color="primary">
-                 ₹{totalAmount}
+                  ₹{totalAmount}
                 </Typography>
               </Box>
 

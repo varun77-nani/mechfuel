@@ -1,21 +1,41 @@
 const FuelOrder = require('../models/FuelOrder');
 
+// Get all fuel orders (admin)
+const getAllFuelOrders = async (req, res) => {
+    try {
+        const orders = await FuelOrder.find()
+            .sort({ createdAt: -1 })
+            .populate('userId', 'username email phone');
+
+        res.json({
+            success: true,
+            data: { orders, total: orders.length }
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false,
+            error: 'Error fetching fuel orders' 
+        });
+    }
+};
+
 // Create new fuel order
 const createFuelOrder = async (req, res) => {
     try {
-        const { fuelType, quantity, location, deliveryNotes } = req.body;
+        const { fuelType, quantity, location, deliveryNotes, pricePerLiter, totalPrice } = req.body;
         
-        // Calculate total amount
-        const pricePerLiter = 3.5; // This could be dynamic based on fuel type
-        const totalAmount = quantity * pricePerLiter;
+        // Use provided pricePerLiter and totalPrice if available
+        const price = pricePerLiter || (fuelType === 'petrol' ? 108.45 : 95.70);
+        const total = totalPrice || (quantity * price);
 
         const fuelOrder = await FuelOrder.create({
             userId: req.user.userId,
             fuelType,
             quantity,
+            pricePerLiter: price,
             location,
             deliveryNotes,
-            totalAmount
+            totalAmount: total
         });
 
         // Populate user details
@@ -111,9 +131,38 @@ const updateFuelOrderStatus = async (req, res) => {
     }
 };
 
+// Delete fuel order
+const deleteFuelOrder = async (req, res) => {
+    try {
+        const order = await FuelOrder.findOneAndDelete({
+            _id: req.params.id,
+            userId: req.user.userId
+        });
+
+        if (!order) {
+            return res.status(404).json({ 
+                success: false,
+                error: 'Order not found' 
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Order deleted successfully'
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false,
+            error: 'Error deleting order' 
+        });
+    }
+};
+
 module.exports = {
+    getAllFuelOrders,
     createFuelOrder,
     getUserFuelOrders,
     getFuelOrder,
-    updateFuelOrderStatus
+    updateFuelOrderStatus,
+    deleteFuelOrder
 };

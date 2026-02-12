@@ -1,0 +1,49 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem 0;
+}
+
+/* Button animations */
+.MuiButton-contained {
+  transition: all 0.3s ease;
+  transform: translateY(0);
+}
+
+.MuiButton-contained:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Card hover effects */
+.MuiCard-root {
+  transition: all 0.3s ease;
+}
+
+.MuiCard-root:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Form inputs */
+.MuiTextField-root, .MuiSelect-root {
+  margin-bottom: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .MuiStepper-root {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  .MuiButton-root {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}

@@ -17,6 +17,11 @@ const fuelOrderSchema = new mongoose.Schema({
         min: [1, 'Quantity must be at least 1 liter'],
         max: [100, 'Quantity cannot exceed 100 liters']
     },
+    pricePerLiter: {
+        type: Number,
+        required: true,
+        min: 0
+    },
     location: {
         address: {
             type: String,

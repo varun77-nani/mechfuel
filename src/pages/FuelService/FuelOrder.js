@@ -13,14 +13,18 @@ import {
   CardContent,
   Divider,
   Snackbar,
-  Alert
+  Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
-import { LocalGasStation, CheckCircle } from '@mui/icons-material';
+import { LocalGasStation, CheckCircle, Payment } from '@mui/icons-material';
 import LocationPicker from '../../components/fuel/LocationPicker';
 import { fuelApi } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 
-const steps = ['Select Fuel Type', 'Enter Location', 'Confirm Order'];
+const steps = ['Select Fuel Type', 'Enter Location', 'Payment Method', 'Confirm Order'];
 
 export default function FuelOrder() {
   const { isAuthenticated } = useAuth();
@@ -32,6 +36,13 @@ export default function FuelOrder() {
   const [quantity, setQuantity] = useState(5);
   const [deliveryNotes, setDeliveryNotes] = useState('');
   const [pricePerLiter, setPricePerLiter] = useState(3.5);
+  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [cardDetails, setCardDetails] = useState({
+    number: '',
+    expiry: '',
+    cvv: '',
+    name: ''
+  });
   const [error, setError] = useState(null);
   const [orderSubmitted, setOrderSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -42,6 +53,10 @@ export default function FuelOrder() {
       diesel: 95.70
     };
     setPricePerLiter(prices[type]);
+  };
+
+  const handleCardDetailChange = (field, value) => {
+    setCardDetails(prev => ({ ...prev, [field]: value }));
   };
 
   const handleNext = () => {
@@ -75,9 +90,15 @@ export default function FuelOrder() {
         totalPrice: Number(quantity) * pricePerLiter
       };
 
-      await fuelApi.createOrder(payload);
+      const response = await fuelApi.createOrder(payload);
 
       setOrderSubmitted(true);
+      // Redirect to dashboard after successful order
+      setTimeout(() => {
+        navigate('/dashboard', { 
+          state: { message: 'Fuel order placed successfully!' }
+        });
+      }, 2000);
       // optionally reset steps or form here
       setActiveStep(0);
       setFuelType('petrol');
@@ -178,6 +199,75 @@ export default function FuelOrder() {
         {activeStep === 2 && (
           <Box>
             <Typography variant="h5" gutterBottom sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
+              <Payment sx={{ mr: 1 }} /> Select Payment Method
+            </Typography>
+            <FormControl fullWidth sx={{ mb: 3 }}>
+              <InputLabel>Payment Method</InputLabel>
+              <Select
+                value={paymentMethod}
+                label="Payment Method"
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              >
+                <MenuItem value="card">Credit/Debit Card</MenuItem>
+                <MenuItem value="paypal">PayPal</MenuItem>
+                <MenuItem value="cash">Cash on Delivery</MenuItem>
+              </Select>
+            </FormControl>
+
+            {paymentMethod === 'card' && (
+              <Box sx={{ mt: 3 }}>
+                <Typography variant="h6" gutterBottom>Card Details</Typography>
+                <TextField
+                  fullWidth
+                  label="Card Number"
+                  value={cardDetails.number}
+                  onChange={(e) => handleCardDetailChange('number', e.target.value)}
+                  placeholder="1234 5678 9012 3456"
+                  sx={{ mb: 2 }}
+                />
+                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                  <TextField
+                    fullWidth
+                    label="Expiry Date"
+                    value={cardDetails.expiry}
+                    onChange={(e) => handleCardDetailChange('expiry', e.target.value)}
+                    placeholder="MM/YY"
+                  />
+                  <TextField
+                    fullWidth
+                    label="CVV"
+                    value={cardDetails.cvv}
+                    onChange={(e) => handleCardDetailChange('cvv', e.target.value)}
+                    placeholder="123"
+                  />
+                </Box>
+                <TextField
+                  fullWidth
+                  label="Cardholder Name"
+                  value={cardDetails.name}
+                  onChange={(e) => handleCardDetailChange('name', e.target.value)}
+                  placeholder="John Doe"
+                />
+              </Box>
+            )}
+
+            {paymentMethod === 'paypal' && (
+              <Alert severity="info" sx={{ mt: 3 }}>
+                You will be redirected to PayPal to complete your payment.
+              </Alert>
+            )}
+
+            {paymentMethod === 'cash' && (
+              <Alert severity="info" sx={{ mt: 3 }}>
+                Please have cash ready when the fuel is delivered.
+              </Alert>
+            )}
+          </Box>
+        )}
+
+        {activeStep === 3 && (
+          <Box>
+            <Typography variant="h5" gutterBottom sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
               <CheckCircle color="success" sx={{ mr: 1 }} /> Confirm Your Order
             </Typography>
             <Card sx={{ mb: 3 }}>
@@ -202,6 +292,10 @@ export default function FuelOrder() {
                     <Typography fontWeight="bold">{deliveryNotes}</Typography>
                   </Box>
                 )}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                  <Typography>Payment Method:</Typography>
+                  <Typography fontWeight="bold">{paymentMethod === 'card' ? 'Credit/Debit Card' : paymentMethod}</Typography>
+                </Box>
                 <Divider sx={{ my: 2 }} />
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="h6">Estimated Total:</Typography>
@@ -234,6 +328,7 @@ export default function FuelOrder() {
             disabled={
               // disable Next/Place Order when invalid
               (activeStep === 1 && (!location || !location.address || quantity <= 0)) ||
+              (activeStep === 2 && paymentMethod === 'card' && (!cardDetails.number || !cardDetails.expiry || !cardDetails.cvv || !cardDetails.name)) ||
               submitting
             }
           >
